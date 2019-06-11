@@ -21,6 +21,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.util.math.MathHelper;
 
 /**
  * Default implementation of the standard render materials.
@@ -30,29 +31,30 @@ import net.minecraft.block.BlockRenderLayer;
  */
 public abstract class RenderMaterialImpl {
 	/** zero position (default value) will be NULL */
-    private static final BlockRenderLayer[] BLEND_MODES = new BlockRenderLayer[5];
-
+    private static final int BLEND_MODE_COUNT = 5;
+    private static final BlockRenderLayer[] BLEND_MODES = new BlockRenderLayer[BLEND_MODE_COUNT];
     
     /**
-     * Indigo currently support up to 3 sprite layers but is configured to recognize only one.
+     * Indigo was designed to support up to 3 sprite layers but is configured to recognize only one.
      */
     public static final int MAX_SPRITE_DEPTH = 1;
+    private static final int MAX_SPRITE_DEPTH_ENCODING = 3;
     
-    private static final int TEXTURE_DEPTH_MASK = 3;
+    private static final int TEXTURE_DEPTH_MASK = MathHelper.smallestEncompassingPowerOfTwo(MAX_SPRITE_DEPTH_ENCODING) - 1;
     private static final int TEXTURE_DEPTH_SHIFT = 0;
     
-    private static final int BLEND_MODE_MASK = 7;
-    private static final int[] BLEND_MODE_SHIFT = new int[3];
-    private static final int[] COLOR_DISABLE_FLAGS = new int[3];
-    private static final int[] EMISSIVE_FLAGS = new int[3];
-    private static final int[] DIFFUSE_FLAGS = new int[3];
-    private static final int[] AO_FLAGS = new int[3];
+    private static final int BLEND_MODE_MASK = MathHelper.smallestEncompassingPowerOfTwo(BLEND_MODE_COUNT) - 1;
+    private static final int[] BLEND_MODE_SHIFT = new int[MAX_SPRITE_DEPTH_ENCODING];
+    private static final int[] COLOR_DISABLE_FLAGS = new int[MAX_SPRITE_DEPTH_ENCODING];
+    private static final int[] EMISSIVE_FLAGS = new int[MAX_SPRITE_DEPTH_ENCODING];
+    private static final int[] DIFFUSE_FLAGS = new int[MAX_SPRITE_DEPTH_ENCODING];
+    private static final int[] AO_FLAGS = new int[MAX_SPRITE_DEPTH_ENCODING];
     
     static {
 	    System.arraycopy(BlockRenderLayer.values(), 0, BLEND_MODES, 1, 4);
 
         int shift = Integer.bitCount(TEXTURE_DEPTH_MASK);
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < MAX_SPRITE_DEPTH_ENCODING; i++) {
             BLEND_MODE_SHIFT[i] = shift;
             shift += Integer.bitCount(BLEND_MODE_MASK);
             COLOR_DISABLE_FLAGS[i] = 1 << shift++;
