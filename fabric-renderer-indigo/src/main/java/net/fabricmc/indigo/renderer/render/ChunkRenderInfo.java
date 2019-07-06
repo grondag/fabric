@@ -129,9 +129,13 @@ public class ChunkRenderInfo {
     void beginBlock() {
         final BlockState blockState = blockInfo.blockState;
         final BlockPos blockPos = blockInfo.blockPos;
-        offsetX = (float) (chunkOffsetX + blockPos.getX());
-        offsetY = (float) (chunkOffsetY + blockPos.getY());
-        offsetZ = (float) (chunkOffsetZ + blockPos.getZ());
+        //TODO: make configurable
+//        offsetX = (float) (chunkOffsetX + blockPos.getX());
+//        offsetY = (float) (chunkOffsetY + blockPos.getY());
+//        offsetZ = (float) (chunkOffsetZ + blockPos.getZ());
+        offsetX = (float) (blockPos.getX());
+        offsetY = (float) (blockPos.getY());
+        offsetZ = (float) (blockPos.getZ());
 
         if(blockState.getBlock().getOffsetType() != OffsetType.NONE) {
             Vec3d offset = blockState.getOffsetPos(blockInfo.blockView, blockPos);
