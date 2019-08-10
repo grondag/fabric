@@ -62,7 +62,7 @@ public class TerrainFallbackConsumer extends AbstractQuadRenderer implements Con
     private final ChunkRenderInfo chunkInfo;
     
     TerrainFallbackConsumer(BlockRenderInfo blockInfo, ChunkRenderInfo chunkInfo, AoCalculator aoCalc, QuadTransform transform) {
-        super(blockInfo, chunkInfo::cachedBrightness, chunkInfo::getInitializedBuffer, aoCalc, transform);
+        super(blockInfo, chunkInfo::getInitializedBuffer, aoCalc, transform);
         this.chunkInfo = chunkInfo;
     }
     
