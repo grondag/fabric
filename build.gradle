@@ -32,10 +32,6 @@ def getSubprojectVersion(project, version) {
 }
 
 def getBranch(){
-	if(System.getenv().GIT_BRANCH){
-		def branch = System.getenv().GIT_BRANCH
-		return branch.substring(branch.lastIndexOf("/") + 1)
-	}
 	if (grgit == null) {
 		return "unknown"
 	}
@@ -210,8 +206,6 @@ dependencies {
 
 version = Globals.baseVersion + "+" + (ENV.BUILD_NUMBER ? ("build." + ENV.BUILD_NUMBER) : "local") + "-" + getBranch()
 
-logger.lifecycle("Building Fabric: " + version)
-
 curseforge {
 	if (project.hasProperty('curse_api_key')){
 		apiKey = project.getProperty('curse_api_key')
@@ -220,7 +214,7 @@ curseforge {
 		id = '306612'
 		changelog = 'A changelog can be found at https://github.com/FabricMC/fabric/commits/master'
 		releaseType = 'alpha'
-		addGameVersion '1.14.4'
+		addGameVersion '1.15-Snapshot'
 		mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
 			displayName = "[$Globals.mcVersion] Fabric API $Globals.baseVersion build $ENV.BUILD_NUMBER"
 		}
