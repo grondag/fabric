@@ -12,8 +12,12 @@
     "issues": "https://github.com/FabricMC/fabric/issues",
     "sources": "https://github.com/FabricMC/fabric"
   },
+  "authors": [
+    "FabricMC"
+  ],
   "depends": {
     "fabricloader": ">=0.6.1",
     "minecraft": "1.15.x"
-  }
+  },
+  "description": "Core API module providing key hooks and intercompatibility features."
 }
