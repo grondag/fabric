@@ -17,6 +17,9 @@
 package net.fabricmc.fabric.api.dimension.v1;
 
 import com.google.common.base.Preconditions;
+
+import net.minecraft.class_4545;
+import net.minecraft.class_4546;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
@@ -52,16 +55,13 @@ public final class FabricDimensionType extends DimensionType {
 	/**
 	 * @param suffix        the string suffix unique to the dimension type
 	 * @param saveDir       the name of the save directory for the dimension type
-	 * @param factory       a function creating new {@code Dimension} instances
-	 * @param defaultPlacer a default {@code EntityPlacer} for the dimension
-	 * @param hasSkyLight   {@code true} if the dimension type should have skylight like the overworld,
-	 *                      {@code false} otherwise
+	 * @param builder   	builder instance containing other parameters
 	 * @see #builder()
 	 */
-	private FabricDimensionType(String suffix, String saveDir, BiFunction<World, DimensionType, ? extends Dimension> factory, EntityPlacer defaultPlacer, boolean hasSkyLight) {
+	private FabricDimensionType(String suffix, String saveDir, Builder builder) {
 		// Pass an arbitrary raw id that does not map to any vanilla dimension. That id should never get used.
-		super(3, suffix, saveDir, factory, hasSkyLight);
-		this.defaultPlacement = defaultPlacer;
+		super(3, suffix, saveDir, builder.factory, builder.skyLight, builder.biomeAccessStrategy);
+		this.defaultPlacement = builder.defaultPlacer;
 	}
 
 	/**
@@ -122,6 +122,7 @@ public final class FabricDimensionType extends DimensionType {
 		private BiFunction<World, DimensionType, ? extends Dimension> factory;
 		private int desiredRawId = 0;
 		private boolean skyLight = true;
+		private class_4545 biomeAccessStrategy = class_4546.INSTANCE;
 
 		private Builder() {
 		}
@@ -174,6 +175,21 @@ public final class FabricDimensionType extends DimensionType {
 		}
 
 		/**
+		 * Governs how biome information is retrieved from random seed and world coordinates.
+		 * If this method is not called, value defaults to the three-dimensional strategy
+		 * used by the End and Nether dimensions.
+		 *
+		 * @param biomeFunction Function to be used for biome generation.
+		 * @return this {@code Builder} object
+		 */
+		public Builder biomeAccessStrategy(class_4545 biomeAccessStrategy) {
+			Preconditions.checkNotNull(biomeAccessStrategy);
+
+			this.biomeAccessStrategy = biomeAccessStrategy;
+			return this;
+		}
+
+		/**
 		 * Sets this dimension's desired raw id.
 		 * If this method is not called, the value defaults to the raw registry id
 		 * of the dimension type.
@@ -209,10 +225,10 @@ public final class FabricDimensionType extends DimensionType {
 			Preconditions.checkArgument(Registry.DIMENSION.get(dimensionId) == null);
 			Preconditions.checkState(this.defaultPlacer != null, "No defaultPlacer has been specified!");
 			Preconditions.checkState(this.factory != null, "No dimension factory has been specified!");
-
+			
 			String suffix = dimensionId.getNamespace() + "_" + dimensionId.getPath();
 			String saveDir = "DIM_" + dimensionId.getNamespace() + "_" + dimensionId.getPath();
-			FabricDimensionType built = new FabricDimensionType(suffix, saveDir, this.factory, this.defaultPlacer, this.skyLight);
+			FabricDimensionType built = new FabricDimensionType(suffix, saveDir, this);
 			Registry.register(Registry.DIMENSION, dimensionId, built);
 
 			if (this.desiredRawId != 0) {
