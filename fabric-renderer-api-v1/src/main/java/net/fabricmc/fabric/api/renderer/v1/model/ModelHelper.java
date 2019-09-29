@@ -79,12 +79,13 @@ public abstract class ModelHelper {
 			builders[i] = ImmutableList.builder();
 		}
 
-		if(mesh == null) {
+		if (mesh == null) {
 			return null;
 		}
 
 		mesh.forEach(q -> {
 			final int limit = q.material().spriteDepth();
+
 			for (int l = 0; l < limit; l++) {
 				Direction face = q.cullFace();
 				builders[face == null ? 6 : face.getId()].add(q.toBakedQuad(l, finder.find(q, l), false));
